@@ -34,6 +34,10 @@ inline double random_double(double min, double max) {
   return min + (max - min) * random_double();
 }
 
+inline int random_int(int min, int max) {
+  return min + std::floor((max - min) * random_double());
+}
+
 inline double clamp(double x, double min, double max) {
   if (x < min) return min;
   if (x > max) return max;
