@@ -2,6 +2,7 @@
 
 #include "hittable.h"
 #include "ray.h"
+#include "texture.h"
 
 inline vec3 reflect(const vec3& v, const vec3& n) {
   return v - 2 * dot(v, n) * n;
@@ -29,19 +30,21 @@ class material {
 
 class lambertian : public material {
  public:
-  lambertian(const vec3& a) : albedo(a) {}
+  //lambertian(const vec3& a) : albedo(a) {}
+  lambertian(shared_ptr<texture> a) : albedo(a) {}
 
   virtual bool scatter(
       const ray& r_in, const hit_record& rec, vec3& attenuation, ray& scattered
   ) const override {
     vec3 scatter_direction = rec.normal + random_unit_vector();
     scattered = ray(rec.p, scatter_direction, r_in.time());
-    attenuation = albedo;
+    attenuation = albedo->value(rec.u, rec.v, rec.p);
     return true;
   }
 
  public:
-  color albedo;
+  //color albedo;
+  shared_ptr<texture> albedo;
 };
 
 class metal : public material {

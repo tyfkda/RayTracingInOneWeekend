@@ -32,8 +32,11 @@ color ray_color(const ray& r, const hittable& world, int depth) {
 bvh_node random_scene() {
   std::vector<shared_ptr<hittable>> objects;
 
-  auto ground_material = make_shared<lambertian>(color(0.5, 0.5, 0.5));
-  objects.push_back(make_shared<sphere>(point3(0,-1000,0), 1000, ground_material));
+  auto ground_material = make_shared<lambertian>(make_shared<solid_color>(0.5, 0.5, 0.5));
+  auto checker = make_shared<checker_texture>(
+      make_shared<solid_color>(0.2, 0.3, 0.1),
+      make_shared<solid_color>(0.9, 0.9, 0.9));
+  objects.push_back(make_shared<sphere>(point3(0,-1000,0), 1000, make_shared<lambertian>(checker)));
 
   for (int a = -11; a < 11; a++) {
     for (int b = -11; b < 11; b++) {
@@ -45,7 +48,7 @@ bvh_node random_scene() {
 
         if (choose_mat < 0.8) {
           // diffuse
-          auto albedo = color::random() * color::random();
+          auto albedo = make_shared<solid_color>(color::random() * color::random());
           sphere_material = make_shared<lambertian>(albedo);
           auto center2 = center + vec3(0, random_double(0, .5), 0);
           objects.push_back(make_shared<moving_sphere>(
@@ -68,7 +71,7 @@ bvh_node random_scene() {
   auto material1 = make_shared<dielectric>(1.5);
   objects.push_back(make_shared<sphere>(point3(0, 1, 0), 1.0, material1));
 
-  auto material2 = make_shared<lambertian>(color(0.4, 0.2, 0.1));
+  auto material2 = make_shared<lambertian>(make_shared<solid_color>(0.4, 0.2, 0.1));
   objects.push_back(make_shared<sphere>(point3(-4, 1, 0), 1.0, material2));
 
   auto material3 = make_shared<metal>(color(0.7, 0.6, 0.5), 0.0);
