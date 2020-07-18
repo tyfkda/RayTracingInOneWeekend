@@ -9,6 +9,7 @@
 #include "bvh.h"
 #include "aarect.h"
 #include "box.h"
+#include "constant_medium.h"
 
 #include <iostream>
 
@@ -142,6 +143,35 @@ hittable_list cornell_box() {
   return objects;
 }
 
+hittable_list cornell_smoke() {
+  hittable_list objects;
+
+  auto red   = make_shared<lambertian>(make_shared<solid_color>(.65, .05, .05));
+  auto white = make_shared<lambertian>(make_shared<solid_color>(.73, .73, .73));
+  auto green = make_shared<lambertian>(make_shared<solid_color>(.12, .45, .15));
+  auto light = make_shared<diffuse_light>(make_shared<solid_color>(7, 7, 7));
+
+  objects.add(make_shared<flip_face>(make_shared<yz_rect>(0, 555, 0, 555, 555, green)));
+  objects.add(make_shared<yz_rect>(0, 555, 0, 555, 0, red));
+  objects.add(make_shared<xz_rect>(113, 443, 127, 432, 554, light));
+  objects.add(make_shared<flip_face>(make_shared<xz_rect>(0, 555, 0, 555, 555, white)));
+  objects.add(make_shared<xz_rect>(0, 555, 0, 555, 0, white));
+  objects.add(make_shared<flip_face>(make_shared<xy_rect>(0, 555, 0, 555, 555, white)));
+
+  shared_ptr<hittable> box1 = make_shared<box>(point3(0,0,0), point3(165,330,165), white);
+  box1 = make_shared<rotate_y>(box1,  15);
+  box1 = make_shared<translate>(box1, vec3(265,0,295));
+
+  shared_ptr<hittable> box2 = make_shared<box>(point3(0,0,0), point3(165,165,165), white);
+  box2 = make_shared<rotate_y>(box2, -18);
+  box2 = make_shared<translate>(box2, vec3(130,0,65));
+
+  objects.add(make_shared<constant_medium>(box1, 0.01, make_shared<solid_color>(0,0,0)));
+  objects.add(make_shared<constant_medium>(box2, 0.01, make_shared<solid_color>(1,1,1)));
+
+  return objects;
+}
+
 int main() {
   const auto aspect_ratio = 16.0 / 9.0;
   const int image_width = 512;
@@ -155,7 +185,8 @@ int main() {
   //auto world = two_perlin_spheres();
   //auto world = earth();
   //auto world = simple_light();
-  auto world = cornell_box();
+  //auto world = cornell_box();
+  auto world = cornell_smoke();
 
   point3 lookfrom(278, 278, -800);
   point3 lookat(278,278,0);
